@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.PROD
-  ? 'https://talkie-backend-szujqamg.fly.dev/api'
+  ? 'https://talkie-backend-edyilnkq.fly.dev/api'
   : '/api';
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
@@ -64,7 +64,7 @@ export const api = {
     if (!res.ok) throw new Error('Upload failed');
     const data = await res.json();
     if (import.meta.env.PROD) {
-      return `https://talkie-backend-szujqamg.fly.dev${data.url}`;
+      return `https://talkie-backend-edyilnkq.fly.dev${data.url}`;
     }
     return data.url;
   },
