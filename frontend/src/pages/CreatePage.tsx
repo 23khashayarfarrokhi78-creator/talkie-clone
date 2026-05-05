@@ -90,7 +90,7 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-36">
       <header className="sticky top-0 bg-bg/80 backdrop-blur-xl z-40 border-b border-white/5">
         <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
           <button onClick={() => navigate('/')} className="p-1 hover:bg-surface-light rounded-lg transition-colors">
@@ -100,7 +100,7 @@ export default function CreatePage() {
         </div>
       </header>
 
-      <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-4 pt-6 flex flex-col gap-6">
+      <form id="create-form" onSubmit={handleSubmit} className="max-w-lg mx-auto px-4 pt-6 flex flex-col gap-6">
         {/* Avatar Upload */}
         <div className="flex flex-col items-center gap-3">
           <div className="relative">
@@ -296,15 +296,22 @@ export default function CreatePage() {
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={!name.trim() || saving}
-          className="w-full bg-primary text-white rounded-xl py-3 font-semibold flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-primary-dark transition-colors mt-2 mb-6"
-        >
-          <Sparkles size={18} />
-          {uploading ? 'Uploading images...' : saving ? 'Creating...' : 'Create Character'}
-        </button>
       </form>
+
+      {/* Fixed submit button above bottom nav */}
+      <div className="fixed bottom-16 left-0 right-0 z-45 bg-bg/90 backdrop-blur-xl border-t border-white/5 px-4 py-3">
+        <div className="max-w-lg mx-auto">
+          <button
+            type="submit"
+            form="create-form"
+            disabled={!name.trim() || saving}
+            className="w-full bg-primary text-white rounded-xl py-3 font-semibold flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-primary-dark transition-colors"
+          >
+            <Sparkles size={18} />
+            {uploading ? 'Uploading images...' : saving ? 'Creating...' : 'Create Character'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
