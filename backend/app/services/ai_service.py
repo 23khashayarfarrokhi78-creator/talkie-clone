@@ -1,6 +1,37 @@
+import re
+import unicodedata
+
 from google import genai
 
 from app.config import settings
+
+
+def _detect_language(text: str) -> str:
+    """Detect language of the input text based on Unicode script analysis."""
+    persian_arabic_count = 0
+    latin_count = 0
+    cjk_count = 0
+    total = 0
+
+    for ch in text:
+        if ch.isalpha():
+            total += 1
+            name = unicodedata.name(ch, "")
+            if "ARABIC" in name:
+                persian_arabic_count += 1
+            elif "CJK" in name or "HIRAGANA" in name or "KATAKANA" in name or "HANGUL" in name:
+                cjk_count += 1
+            elif "LATIN" in name:
+                latin_count += 1
+
+    if total == 0:
+        return "en"
+
+    if persian_arabic_count / total > 0.3:
+        return "fa"
+    if cjk_count / total > 0.3:
+        return "cjk"
+    return "en"
 
 
 def _build_system_prompt(character_name: str, personality: str, scenario: str, description: str) -> str:
@@ -16,6 +47,11 @@ def _build_system_prompt(character_name: str, personality: str, scenario: str, d
         "Respond naturally as this character would in the given scenario.",
         "Use emotions and actions in *asterisks* when appropriate.",
         "Be creative, descriptive, and immersive in your responses.",
+        "",
+        "IMPORTANT: Always respond in the SAME LANGUAGE as the user's message.",
+        "If the user writes in Persian/Farsi, respond in Persian/Farsi.",
+        "If the user writes in English, respond in English.",
+        "Match the user's language naturally.",
     ]
     return "\n".join(p for p in parts if p)
 
@@ -62,14 +98,59 @@ async def generate_response(
         return _fallback_response(character_name, user_message)
 
 
+def _extract_keywords(text: str) -> list[str]:
+    """Extract meaningful words from user message for contextual responses."""
+    words = re.findall(r'\b\w{3,}\b', text.lower())
+    stop_words = {
+        "the", "and", "for", "are", "but", "not", "you", "all", "can",
+        "her", "was", "one", "our", "out", "this", "that", "with", "have",
+        "from", "they", "been", "said", "each", "which", "their", "will",
+        "other", "about", "many", "then", "them", "these", "some", "would",
+        "like", "into", "just", "what", "how", "who", "where", "when",
+    }
+    return [w for w in words if w not in stop_words][:5]
+
+
 def _fallback_response(character_name: str, user_message: str) -> str:
-    responses = [
-        f"*{character_name} smiles warmly* That's really interesting! Tell me more about that.",
-        f"*{character_name} thinks for a moment* Hmm, I see what you mean. What else is on your mind?",
-        f"*{character_name} nods* I appreciate you sharing that with me. How does that make you feel?",
-        f"*{character_name} leans in curiously* Oh? That sounds fascinating! Go on...",
-        f"*{character_name} laughs softly* You always know how to keep a conversation interesting!",
-    ]
+    lang = _detect_language(user_message)
+    keywords = _extract_keywords(user_message)
+    topic = " ".join(keywords[:3]) if keywords else ""
+
+    if lang == "fa":
+        if topic:
+            responses = [
+                f"*{character_name} با علاقه گوش می‌دهد* جالبه که درباره‌ی «{user_message[:40]}» صحبت می‌کنی. بیشتر بگو!",
+                f"*{character_name} لبخند می‌زند* درباره‌ی «{user_message[:40]}» خیلی کنجکاوم. نظرت چیه؟",
+                f"*{character_name} سر تکان می‌دهد* فهمیدم چی میگی. درباره «{user_message[:40]}» چیز بیشتری هست که بخوای بگی؟",
+                f"*{character_name} با دقت فکر می‌کند* «{user_message[:40]}»... این خیلی جالبه! ادامه بده.",
+                f"*{character_name} با ذوق* واقعاً؟ درباره‌ی «{user_message[:40]}» بیشتر توضیح بده!",
+            ]
+        else:
+            responses = [
+                f"*{character_name} لبخند می‌زند* سلام! خوشحالم که اینجایی. چه خبر؟",
+                f"*{character_name} با مهربانی* هی! امروز چطوری؟",
+                f"*{character_name} با کنجکاوی* جالبه! بیشتر برام بگو.",
+                f"*{character_name} سر تکان می‌دهد* آره، درسته. چه چیز دیگه‌ای تو ذهنته؟",
+                f"*{character_name} با علاقه* خوبه! من گوش میدم، ادامه بده.",
+            ]
+    else:
+        if topic:
+            responses = [
+                f"*{character_name} listens intently* That's interesting about \"{user_message[:40]}\". Tell me more!",
+                f"*{character_name} smiles thoughtfully* I'm curious about \"{user_message[:40]}\". What are your thoughts?",
+                f"*{character_name} nods* I hear you on \"{user_message[:40]}\". Is there more to it?",
+                f"*{character_name} thinks carefully* \"{user_message[:40]}\"... that's fascinating. Go on!",
+                f"*{character_name} leans forward* Really? Tell me more about \"{user_message[:40]}\"!",
+            ]
+        else:
+            responses = [
+                f"*{character_name} smiles warmly* Hey there! What's on your mind?",
+                f"*{character_name} looks at you kindly* I'm here for you. What would you like to talk about?",
+                f"*{character_name} nods* Interesting! Tell me more about that.",
+                f"*{character_name} tilts head curiously* I'd love to hear more. Go ahead!",
+                f"*{character_name} laughs softly* You've got my attention! What's next?",
+            ]
+
     import hashlib
     idx = int(hashlib.md5(user_message.encode()).hexdigest(), 16) % len(responses)
     return responses[idx]

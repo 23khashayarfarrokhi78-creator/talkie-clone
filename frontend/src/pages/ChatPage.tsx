@@ -162,30 +162,30 @@ export default function ChatPage() {
       )}
       {/* Header */}
       <header className="sticky top-0 bg-surface/90 backdrop-blur-xl z-40 border-b border-white/5 relative">
-        <div className="flex items-center gap-3 px-3 py-3 max-w-lg mx-auto">
-          <button onClick={() => navigate('/')} className="p-1 hover:bg-surface-light rounded-lg transition-colors">
-            <ArrowLeft size={22} className="text-text" />
+        <div className="flex items-center gap-3 px-4 py-3.5 max-w-lg mx-auto">
+          <button onClick={() => navigate('/')} className="p-2 hover:bg-surface-light rounded-xl transition-colors active:scale-95">
+            <ArrowLeft size={24} className="text-text" />
           </button>
           <Avatar name={character.name} color={character.avatar_color} avatarUrl={character.avatar_url} size="sm" />
           <div className="flex-1 min-w-0">
-            <h2 className="font-semibold text-sm text-text truncate">{character.name}</h2>
-            <p className="text-[10px] text-text-muted truncate">{character.tagline}</p>
+            <h2 className="font-semibold text-[15px] text-text truncate">{character.name}</h2>
+            <p className="text-xs text-text-muted truncate">{character.tagline}</p>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setTtsEnabled(!ttsEnabled)}
-              className={`p-2 rounded-lg transition-colors ${ttsEnabled ? 'text-primary bg-primary/10' : 'text-text-muted hover:text-text'}`}
+              className={`p-2.5 rounded-xl transition-colors active:scale-95 ${ttsEnabled ? 'text-primary bg-primary/10' : 'text-text-muted hover:text-text hover:bg-surface-light'}`}
               title={ttsEnabled ? 'Disable voice' : 'Enable voice'}
             >
-              {ttsEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+              {ttsEnabled ? <Volume2 size={22} /> : <VolumeX size={22} />}
             </button>
             {conversationId && (
               <button
                 onClick={clearChat}
-                className="p-2 rounded-lg text-text-muted hover:text-accent transition-colors"
+                className="p-2.5 rounded-xl text-text-muted hover:text-accent hover:bg-surface-light transition-colors active:scale-95"
                 title="Clear chat"
               >
-                <Trash2 size={18} />
+                <Trash2 size={22} />
               </button>
             )}
           </div>
@@ -193,8 +193,8 @@ export default function ChatPage() {
       </header>
 
       {/* Messages */}
-      <main className="flex-1 overflow-y-auto px-4 py-4 max-w-lg mx-auto w-full relative z-10">
-        <div className="flex flex-col gap-3">
+      <main className="flex-1 overflow-y-auto px-5 py-5 max-w-lg mx-auto w-full relative z-10">
+        <div className="flex flex-col gap-4">
           {messages.length === 0 && !isTyping && (
             <div className="text-center py-12">
               <Avatar name={character.name} color={character.avatar_color} avatarUrl={character.avatar_url} size="xl" />
@@ -220,16 +220,16 @@ export default function ChatPage() {
 
       {/* Input */}
       <footer className="sticky bottom-0 bg-surface/90 backdrop-blur-xl border-t border-white/5 safe-area-bottom relative z-10">
-        <div className="flex items-end gap-2 px-3 py-3 max-w-lg mx-auto">
+        <div className="flex items-end gap-2.5 px-4 py-3.5 max-w-lg mx-auto">
           <button
             onClick={toggleListening}
-            className={`p-2.5 rounded-xl transition-colors shrink-0 ${
+            className={`p-3 rounded-xl transition-colors shrink-0 active:scale-95 ${
               isListening
                 ? 'bg-accent text-white animate-pulse'
                 : 'text-text-muted hover:text-text hover:bg-surface-light'
             }`}
           >
-            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+            {isListening ? <MicOff size={22} /> : <Mic size={22} />}
           </button>
           <textarea
             ref={inputRef}
@@ -238,14 +238,14 @@ export default function ChatPage() {
             onKeyDown={handleKeyDown}
             placeholder={`Message ${character.name}...`}
             rows={1}
-            className="flex-1 bg-surface-light text-text text-sm rounded-xl px-4 py-2.5 resize-none border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted max-h-[120px]"
+            className="flex-1 bg-surface-light text-text text-[15px] rounded-2xl px-4 py-3 resize-none border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted max-h-[120px]"
           />
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isTyping}
-            className="p-2.5 rounded-xl bg-primary text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-primary-dark transition-colors shrink-0"
+            className="p-3 rounded-xl bg-primary text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-primary-dark transition-colors shrink-0 active:scale-95"
           >
-            <Send size={20} />
+            <Send size={22} />
           </button>
         </div>
       </footer>

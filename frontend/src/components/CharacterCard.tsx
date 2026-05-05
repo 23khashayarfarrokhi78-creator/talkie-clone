@@ -13,15 +13,15 @@ export default function CharacterCard({ character }: CharacterCardProps) {
   return (
     <button
       onClick={() => navigate(`/chat/${character.id}`)}
-      className="bg-surface rounded-2xl p-4 flex flex-col items-center text-center gap-3 hover:bg-surface-light transition-all duration-200 cursor-pointer active:scale-[0.97] border border-white/5 hover:border-white/10 w-full"
+      className="bg-surface rounded-2xl p-5 flex flex-col items-center text-center gap-3.5 hover:bg-surface-light transition-all duration-200 cursor-pointer active:scale-[0.97] border border-white/5 hover:border-white/10 w-full"
     >
       <Avatar name={character.name} color={character.avatar_color} avatarUrl={character.avatar_url} size="lg" />
-      <div className="flex flex-col gap-1 min-w-0 w-full">
-        <h3 className="font-semibold text-text truncate">{character.name}</h3>
-        <p className="text-xs text-text-muted line-clamp-2">{character.tagline}</p>
+      <div className="flex flex-col gap-1.5 min-w-0 w-full">
+        <h3 className="font-semibold text-[15px] text-text truncate">{character.name}</h3>
+        <p className="text-xs text-text-muted line-clamp-2 leading-relaxed">{character.tagline}</p>
       </div>
-      <div className="flex items-center gap-1 text-xs text-text-muted">
-        <MessageCircle size={12} />
+      <div className="flex items-center gap-1.5 text-sm text-text-muted bg-surface-light px-3.5 py-1.5 rounded-full">
+        <MessageCircle size={14} />
         <span>Chat</span>
       </div>
     </button>

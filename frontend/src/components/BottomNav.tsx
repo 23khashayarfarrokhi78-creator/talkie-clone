@@ -15,19 +15,19 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-white/5 z-50 safe-area-bottom">
-      <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
+      <div className="flex justify-around items-center h-[72px] max-w-lg mx-auto">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
           return (
             <button
               key={tab.path}
               onClick={() => navigate(tab.path)}
-              className={`flex flex-col items-center gap-1 px-6 py-2 rounded-lg transition-colors ${
+              className={`flex flex-col items-center gap-1.5 px-8 py-2.5 rounded-xl transition-colors active:scale-95 ${
                 isActive ? 'text-primary' : 'text-text-muted hover:text-text'
               }`}
             >
-              <tab.icon size={22} />
-              <span className="text-[10px] font-medium">{tab.label}</span>
+              <tab.icon size={26} />
+              <span className="text-xs font-medium">{tab.label}</span>
             </button>
           );
         })}

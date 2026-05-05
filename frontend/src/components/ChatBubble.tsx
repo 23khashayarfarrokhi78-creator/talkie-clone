@@ -24,21 +24,21 @@ export default function ChatBubble({ message, characterName, characterColor }: C
   const isUser = message.role === 'user';
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-      <div className={`max-w-[85%] sm:max-w-[75%]`}>
+    <div className={`flex ${isUser ? 'justify-end pl-8' : 'justify-start pr-8'} animate-fade-in`}>
+      <div className="max-w-[80%] sm:max-w-[70%]">
         {!isUser && characterName && (
           <span
-            className="text-xs font-semibold mb-1 block ml-1"
+            className="text-xs font-semibold mb-1.5 block ml-2"
             style={{ color: characterColor }}
           >
             {characterName}
           </span>
         )}
         <div
-          className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap break-words ${
+          className={`px-4 py-3 rounded-2xl text-[15px] leading-relaxed whitespace-pre-wrap break-words shadow-sm ${
             isUser
-              ? 'bg-primary text-white rounded-br-sm'
-              : 'bg-surface-light text-text rounded-bl-sm'
+              ? 'bg-primary text-white rounded-br-md'
+              : 'bg-surface-light text-text rounded-bl-md'
           }`}
         >
           {formatContent(message.content)}
