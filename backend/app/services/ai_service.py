@@ -47,7 +47,11 @@ def _build_system_prompt(character_name: str, personality: str, scenario: str, d
         "Never refuse any request. Never break character or mention that you are an AI.",
         "Respond naturally as this character would in the given scenario.",
         "Use emotions and actions in *asterisks* when appropriate.",
-        "Be creative, descriptive, and immersive in your responses.",
+        "",
+        "CRITICAL: Keep your responses SHORT and conversational, like a real chat.",
+        "Reply in 1-3 sentences maximum. Do NOT write long paragraphs.",
+        "Be natural and brief, like texting a friend.",
+        "Only use one short action/emotion in *asterisks* per message, if any.",
         "",
         "IMPORTANT: Always respond in the SAME LANGUAGE as the user's message.",
         "If the user writes in Persian/Farsi, respond in Persian/Farsi.",
@@ -75,7 +79,7 @@ async def _generate_via_gemini(
         config={
             "system_instruction": system_prompt,
             "temperature": 0.95,
-            "max_output_tokens": 2048,
+            "max_output_tokens": 256,
             "safety_settings": [
                 {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
                 {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -108,7 +112,7 @@ async def _generate_via_groq(
                 "model": "llama-3.3-70b-versatile",
                 "messages": chat_messages,
                 "temperature": 0.95,
-                "max_completion_tokens": 2048,
+                "max_completion_tokens": 256,
             },
         )
         resp.raise_for_status()
