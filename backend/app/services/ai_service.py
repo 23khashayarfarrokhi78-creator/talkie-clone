@@ -1,6 +1,7 @@
 import re
 import unicodedata
 
+import httpx
 from google import genai
 
 from app.config import settings
@@ -56,6 +57,65 @@ def _build_system_prompt(character_name: str, personality: str, scenario: str, d
     return "\n".join(p for p in parts if p)
 
 
+async def _generate_via_gemini(
+    system_prompt: str,
+    messages: list[dict[str, str]],
+    user_message: str,
+) -> str:
+    contents: list[dict[str, str]] = []
+    for msg in messages[-20:]:
+        role = "user" if msg["role"] == "user" else "model"
+        contents.append({"role": role, "parts": [{"text": msg["content"]}]})
+    contents.append({"role": "user", "parts": [{"text": user_message}]})
+
+    client = genai.Client(api_key=settings.gemini_api_key)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=contents,
+        config={
+            "system_instruction": system_prompt,
+            "temperature": 0.95,
+            "max_output_tokens": 2048,
+            "safety_settings": [
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+            ],
+        },
+    )
+    return response.text or "..."
+
+
+async def _generate_via_groq(
+    system_prompt: str,
+    messages: list[dict[str, str]],
+    user_message: str,
+) -> str:
+    chat_messages = [{"role": "system", "content": system_prompt}]
+    for msg in messages[-20:]:
+        chat_messages.append({"role": msg["role"], "content": msg["content"]})
+    chat_messages.append({"role": "user", "content": user_message})
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        resp = await client.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {settings.groq_api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "llama-3.3-70b-versatile",
+                "messages": chat_messages,
+                "temperature": 0.95,
+                "max_completion_tokens": 2048,
+            },
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["choices"][0]["message"]["content"]
+
+
 async def generate_response(
     character_name: str,
     personality: str,
@@ -64,38 +124,32 @@ async def generate_response(
     messages: list[dict[str, str]],
     user_message: str,
 ) -> str:
-    if not settings.gemini_api_key:
+    has_gemini = bool(settings.gemini_api_key)
+    has_groq = bool(settings.groq_api_key)
+
+    if not has_gemini and not has_groq:
         return _fallback_response(character_name, user_message)
 
     system_prompt = _build_system_prompt(character_name, personality, scenario, description)
 
-    contents: list[dict[str, str]] = []
-    for msg in messages[-20:]:
-        role = "user" if msg["role"] == "user" else "model"
-        contents.append({"role": role, "parts": [{"text": msg["content"]}]})
-    contents.append({"role": "user", "parts": [{"text": user_message}]})
+    # Try Groq first (more reliable free tier), then Gemini as fallback
+    providers: list[str] = []
+    if has_groq:
+        providers.append("groq")
+    if has_gemini:
+        providers.append("gemini")
 
-    try:
-        client = genai.Client(api_key=settings.gemini_api_key)
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=contents,
-            config={
-                "system_instruction": system_prompt,
-                "temperature": 0.95,
-                "max_output_tokens": 2048,
-                "safety_settings": [
-                    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-                ],
-            },
-        )
-        return response.text or "..."
-    except Exception as e:
-        print(f"AI API error: {e}")
-        return _fallback_response(character_name, user_message)
+    for provider in providers:
+        try:
+            if provider == "groq":
+                return await _generate_via_groq(system_prompt, messages, user_message)
+            else:
+                return await _generate_via_gemini(system_prompt, messages, user_message)
+        except Exception as e:
+            print(f"AI API error ({provider}): {e}")
+            continue
+
+    return _fallback_response(character_name, user_message)
 
 
 def _extract_keywords(text: str) -> list[str]:
