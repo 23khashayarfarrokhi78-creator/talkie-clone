@@ -193,7 +193,7 @@ export default function ChatPage() {
       </header>
 
       {/* Messages */}
-      <main className="flex-1 overflow-y-auto px-5 py-5 max-w-lg mx-auto w-full relative z-10">
+      <main className="flex-1 overflow-y-auto px-6 py-5 max-w-lg mx-auto w-full relative z-10">
         <div className="flex flex-col gap-4">
           {messages.length === 0 && !isTyping && (
             <div className="text-center py-12">
