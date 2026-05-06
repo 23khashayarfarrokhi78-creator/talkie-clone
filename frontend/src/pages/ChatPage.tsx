@@ -220,7 +220,7 @@ export default function ChatPage() {
 
       {/* Input */}
       <footer className="sticky bottom-0 bg-surface/90 backdrop-blur-xl border-t border-white/5 safe-area-bottom relative z-10">
-        <div className="flex items-end gap-2.5 px-4 py-3.5 max-w-lg mx-auto">
+        <div className="flex items-end gap-2.5 px-4 py-5 max-w-lg mx-auto">
           <button
             onClick={toggleListening}
             className={`p-3 rounded-xl transition-colors shrink-0 active:scale-95 ${
@@ -238,7 +238,8 @@ export default function ChatPage() {
             onKeyDown={handleKeyDown}
             placeholder={`Message ${character.name}...`}
             rows={1}
-            className="flex-1 bg-surface-light text-text text-[15px] rounded-2xl px-5 py-3 resize-none border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted max-h-[120px]"
+            className="flex-1 bg-surface-light text-text text-[15px] rounded-2xl px-5 py-4 resize-none border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted max-h-[160px]"
+            style={{ minHeight: 52 }}
           />
           <button
             onClick={sendMessage}
