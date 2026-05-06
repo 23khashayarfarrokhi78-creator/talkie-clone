@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Mic, MicOff, Volume2, VolumeX, Trash2 } from 'lucide-react';
+import { ArrowLeft, Send, Mic, MicOff, Volume2, VolumeX, RotateCcw } from 'lucide-react';
 import type { Character, Message } from '../types';
 import { api } from '../services/api';
 import Avatar from '../components/Avatar';
@@ -119,8 +119,12 @@ export default function ChatPage() {
   };
 
   const clearChat = async () => {
-    if (!conversationId) return;
-    await api.deleteConversation(conversationId);
+    if (!conversationId && messages.length === 0) return;
+    const ok = window.confirm('Reset conversation? All messages will be deleted.');
+    if (!ok) return;
+    if (conversationId) {
+      await api.deleteConversation(conversationId);
+    }
     setMessages([]);
     setConversationId(null);
   };
@@ -179,15 +183,13 @@ export default function ChatPage() {
             >
               {ttsEnabled ? <Volume2 size={22} /> : <VolumeX size={22} />}
             </button>
-            {conversationId && (
-              <button
-                onClick={clearChat}
-                className="p-2.5 rounded-xl text-text-muted hover:text-accent hover:bg-surface-light transition-colors active:scale-95"
-                title="Clear chat"
-              >
-                <Trash2 size={22} />
-              </button>
-            )}
+            <button
+              onClick={clearChat}
+              className="p-2.5 rounded-xl text-text-muted hover:text-accent hover:bg-surface-light transition-colors active:scale-95"
+              title="Reset conversation"
+            >
+              <RotateCcw size={22} />
+            </button>
           </div>
         </div>
       </header>
