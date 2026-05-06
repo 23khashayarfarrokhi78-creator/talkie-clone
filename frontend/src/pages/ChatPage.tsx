@@ -199,8 +199,8 @@ export default function ChatPage() {
             <div className="text-center py-12">
               <Avatar name={character.name} color={character.avatar_color} avatarUrl={character.avatar_url} size="xl" />
               <h3 className="font-bold text-lg text-text mt-4">{character.name}</h3>
-              <p className="text-sm text-text-muted mt-1 max-w-[250px] mx-auto">{character.tagline}</p>
-              <p className="text-xs text-text-muted mt-4 bg-surface rounded-xl px-4 py-3 max-w-[300px] mx-auto">
+              <p className="text-sm text-text-muted mt-1 max-w-[280px] mx-auto px-2">{character.tagline}</p>
+              <p className="text-xs text-text-muted mt-4 bg-surface rounded-xl px-6 py-4 max-w-[320px] mx-auto overflow-hidden">
                 {character.scenario || `Say hello to ${character.name}!`}
               </p>
             </div>
@@ -238,7 +238,7 @@ export default function ChatPage() {
             onKeyDown={handleKeyDown}
             placeholder={`Message ${character.name}...`}
             rows={1}
-            className="flex-1 bg-surface-light text-text text-[15px] rounded-2xl px-4 py-3 resize-none border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted max-h-[120px]"
+            className="flex-1 bg-surface-light text-text text-[15px] rounded-2xl px-5 py-3 resize-none border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted max-h-[120px]"
           />
           <button
             onClick={sendMessage}
