@@ -14,13 +14,13 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-24">
       <header className="sticky top-0 bg-bg/80 backdrop-blur-xl z-40 border-b border-white/5">
         <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
-          <button onClick={() => navigate('/')} className="p-1 hover:bg-surface-light rounded-lg transition-colors">
-            <ArrowLeft size={22} className="text-text" />
+          <button onClick={() => navigate('/')} className="p-2 hover:bg-surface-light rounded-xl transition-colors active:scale-95">
+            <ArrowLeft size={24} className="text-text" />
           </button>
-          <h1 className="font-semibold text-text">Settings</h1>
+          <h1 className="font-semibold text-lg text-text">Settings</h1>
         </div>
       </header>
 
