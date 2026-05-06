@@ -26,9 +26,9 @@ export default function ChatBubble({ message, characterName, characterColor }: C
   return (
     <div
       className={`flex ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`}
-      style={{ paddingLeft: isUser ? 60 : 0, paddingRight: isUser ? 0 : 60 }}
+      style={{ paddingLeft: isUser ? 80 : 0, paddingRight: isUser ? 0 : 80 }}
     >
-      <div style={{ maxWidth: '75%' }}>
+      <div style={{ maxWidth: '70%' }}>
         {!isUser && characterName && (
           <span
             className="text-xs font-semibold mb-1.5 block"
@@ -43,7 +43,7 @@ export default function ChatBubble({ message, characterName, characterColor }: C
               ? 'bg-primary text-white rounded-br-md'
               : 'bg-surface-light text-text rounded-bl-md'
           }`}
-          style={{ padding: '14px 20px' }}
+          style={{ padding: '16px 24px' }}
         >
           {formatContent(message.content)}
         </div>
