@@ -90,7 +90,7 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-40">
       <header className="sticky top-0 bg-bg/80 backdrop-blur-xl z-40 border-b border-white/5">
         <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
           <button onClick={() => navigate('/')} className="p-2 hover:bg-surface-light rounded-xl transition-colors active:scale-95">
@@ -298,7 +298,7 @@ export default function CreatePage() {
 
       </form>
 
-      <div className="sticky bottom-0 bg-bg/90 backdrop-blur-xl border-t border-white/5 z-40">
+      <div className="fixed left-0 right-0 bg-bg/90 backdrop-blur-xl border-t border-white/5 z-50" style={{ bottom: 72 }}>
         <div className="max-w-lg mx-auto px-4 py-4">
           <button
             type="button"
