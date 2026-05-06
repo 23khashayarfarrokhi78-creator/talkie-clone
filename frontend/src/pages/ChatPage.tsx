@@ -223,13 +223,14 @@ export default function ChatPage() {
         <div className="flex items-end gap-2.5 px-4 py-5 max-w-lg mx-auto">
           <button
             onClick={toggleListening}
-            className={`p-3 rounded-xl transition-colors shrink-0 active:scale-95 ${
+            className={`rounded-xl transition-colors shrink-0 active:scale-95 flex items-center justify-center ${
               isListening
                 ? 'bg-accent text-white animate-pulse'
                 : 'text-text-muted hover:text-text hover:bg-surface-light'
             }`}
+            style={{ width: 52, height: 52 }}
           >
-            {isListening ? <MicOff size={22} /> : <Mic size={22} />}
+            {isListening ? <MicOff size={24} /> : <Mic size={24} />}
           </button>
           <textarea
             ref={inputRef}
@@ -244,9 +245,10 @@ export default function ChatPage() {
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isTyping}
-            className="p-3 rounded-xl bg-primary text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-primary-dark transition-colors shrink-0 active:scale-95"
+            className="rounded-xl bg-primary text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-primary-dark transition-colors shrink-0 active:scale-95 flex items-center justify-center"
+            style={{ width: 52, height: 52 }}
           >
-            <Send size={22} />
+            <Send size={24} />
           </button>
         </div>
       </footer>
