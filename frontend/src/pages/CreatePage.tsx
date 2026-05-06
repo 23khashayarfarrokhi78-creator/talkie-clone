@@ -296,15 +296,27 @@ export default function CreatePage() {
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={!name.trim() || saving}
-          className="w-full bg-primary text-white rounded-xl py-3 font-semibold flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-primary-dark transition-colors mt-2 mb-6"
-        >
-          <Sparkles size={18} />
-          {uploading ? 'Uploading images...' : saving ? 'Creating...' : 'Create Character'}
-        </button>
       </form>
+
+      <div className="sticky bottom-0 bg-bg/90 backdrop-blur-xl border-t border-white/5 z-40">
+        <div className="max-w-lg mx-auto px-4 py-4">
+          <button
+            type="button"
+            onClick={() => {
+              const form = document.querySelector('form');
+              if (form) form.requestSubmit();
+            }}
+            disabled={!name.trim() || saving}
+            className="w-full bg-primary text-white rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-primary-dark transition-colors active:scale-[0.98]"
+            style={{ height: 52 }}
+          >
+            <Sparkles size={20} />
+            <span className="text-[15px]">
+              {uploading ? 'Uploading images...' : saving ? 'Creating...' : 'Create Character'}
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
