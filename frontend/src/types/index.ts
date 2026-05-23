@@ -1,3 +1,9 @@
+export interface BackgroundMediaItem {
+  type: 'image' | 'video';
+  url: string;
+  label?: string;
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -9,6 +15,7 @@ export interface Character {
   avatar_url: string;
   avatar_color: string;
   background_url: string;
+  background_media: BackgroundMediaItem[];
   category: string;
   is_default: boolean;
   created_at: string;

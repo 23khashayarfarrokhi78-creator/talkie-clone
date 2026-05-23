@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, Mic, MicOff, Volume2, VolumeX, Trash2 } from 'lucide-react';
-import type { Character, Message } from '../types';
+import { ArrowLeft, Send, Mic, MicOff, Volume2, VolumeX, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import type { Character, Message, BackgroundMediaItem } from '../types';
 import { api } from '../services/api';
 import Avatar from '../components/Avatar';
 import ChatBubble from '../components/ChatBubble';
@@ -20,11 +20,28 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  const mediaItems = useMemo<BackgroundMediaItem[]>(() => {
+    if (!character) return [];
+    if (character.background_media && character.background_media.length > 0) {
+      return character.background_media;
+    }
+    if (character.background_url) {
+      return [{ type: 'image', url: character.background_url }];
+    }
+    return [];
+  }, [character]);
+
+  const activeMedia = mediaItems[activeMediaIndex] ?? null;
 
   useEffect(() => {
     if (!characterId) return;
-    api.getCharacter(characterId).then(setCharacter);
+    api.getCharacter(characterId).then((c) => {
+      setCharacter(c);
+      setActiveMediaIndex(0);
+    });
     api.getConversations(characterId).then((convos) => {
       if (convos.length > 0) {
         setConversationId(convos[0].id);
@@ -146,22 +163,37 @@ export default function ChatPage() {
     );
   }
 
-  const bgStyle = character.background_url
-    ? {
-        backgroundImage: `url(${character.background_url})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed' as const,
-      }
-    : undefined;
+  const hasBackground = mediaItems.length > 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg relative" style={bgStyle}>
-      {character.background_url && (
-        <div className="absolute inset-0 bg-bg/70 backdrop-blur-[2px]" />
+    <div className="min-h-screen flex flex-col bg-bg relative overflow-x-hidden">
+      {/* Background layer */}
+      {hasBackground && activeMedia && (
+        <>
+          {activeMedia.type === 'video' ? (
+            <video
+              key={activeMedia.url}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+            >
+              <source src={activeMedia.url} />
+            </video>
+          ) : (
+            <div
+              className="absolute inset-0 z-0 bg-cover bg-center bg-fixed"
+              style={{ backgroundImage: `url(${activeMedia.url})` }}
+            />
+          )}
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-bg/70 backdrop-blur-[2px] z-[1]" />
+        </>
       )}
+
       {/* Header */}
-      <header className="sticky top-0 bg-surface/90 backdrop-blur-xl z-40 border-b border-white/5 relative">
+      <header className="sticky top-0 bg-surface/90 backdrop-blur-xl z-40 border-b border-white/5">
         <div className="flex items-center gap-3 px-3 py-3 max-w-lg mx-auto">
           <button onClick={() => navigate('/')} className="p-1 hover:bg-surface-light rounded-lg transition-colors">
             <ArrowLeft size={22} className="text-text" />
@@ -193,7 +225,7 @@ export default function ChatPage() {
       </header>
 
       {/* Messages */}
-      <main className="flex-1 overflow-y-auto px-4 py-4 max-w-lg mx-auto w-full relative z-10">
+      <main className="flex-1 overflow-y-auto px-4 py-4 pb-28 max-w-lg mx-auto w-full relative z-10">
         <div className="flex flex-col gap-3">
           {messages.length === 0 && !isTyping && (
             <div className="text-center py-12">
@@ -219,8 +251,44 @@ export default function ChatPage() {
       </main>
 
       {/* Input */}
-      <footer className="sticky bottom-0 bg-surface/90 backdrop-blur-xl border-t border-white/5 safe-area-bottom relative z-10">
-        <div className="flex items-end gap-2 px-3 py-3 max-w-lg mx-auto">
+      <footer className="sticky bottom-0 bg-surface/90 backdrop-blur-xl border-t border-white/5 safe-area-bottom z-40">
+        {/* Background media switcher */}
+        {mediaItems.length > 1 && (
+          <div className="flex items-center justify-center gap-3 px-3 pt-2">
+            <button
+              onClick={() => setActiveMediaIndex((i) => (i - 1 + mediaItems.length) % mediaItems.length)}
+              className="p-1 rounded-lg text-text-muted hover:text-text hover:bg-surface-light transition-colors"
+              title="Previous background"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <div className="flex items-center gap-1.5">
+              {mediaItems.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveMediaIndex(idx)}
+                  className={`rounded-full transition-all ${
+                    idx === activeMediaIndex
+                      ? 'w-2.5 h-2.5 bg-primary'
+                      : 'w-2 h-2 bg-text-muted/40 hover:bg-text-muted/70'
+                  }`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={() => setActiveMediaIndex((i) => (i + 1) % mediaItems.length)}
+              className="p-1 rounded-lg text-text-muted hover:text-text hover:bg-surface-light transition-colors"
+              title="Next background"
+            >
+              <ChevronRight size={16} />
+            </button>
+            {activeMedia?.label && (
+              <span className="text-[10px] text-text-muted truncate max-w-[120px]">{activeMedia.label}</span>
+            )}
+          </div>
+        )}
+
+        <div className="flex items-end gap-3 px-3 py-3 max-w-lg mx-auto">
           <button
             onClick={toggleListening}
             className={`p-2.5 rounded-xl transition-colors shrink-0 ${
@@ -231,15 +299,17 @@ export default function ChatPage() {
           >
             {isListening ? <MicOff size={20} /> : <Mic size={20} />}
           </button>
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={handleTextareaInput}
-            onKeyDown={handleKeyDown}
-            placeholder={`Message ${character.name}...`}
-            rows={1}
-            className="flex-1 bg-surface-light text-text text-sm rounded-xl px-4 py-2.5 resize-none border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted max-h-[120px]"
-          />
+          <div className="flex-1 min-w-0">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={handleTextareaInput}
+              onKeyDown={handleKeyDown}
+              placeholder={`Message ${character.name}...`}
+              rows={1}
+              className="w-full bg-surface-light text-text text-sm rounded-xl px-4 py-3 resize-none border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted min-h-[44px] max-h-[120px]"
+            />
+          </div>
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isTyping}
