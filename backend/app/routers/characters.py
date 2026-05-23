@@ -37,7 +37,15 @@ async def create_character(
     data: CharacterCreate,
     db: AsyncSession = Depends(get_db),
 ) -> Character:
-    character = Character(**data.model_dump())
+    payload = data.model_dump()
+    if payload.get("background_media"):
+        payload["background_media"] = [
+            item if isinstance(item, dict) else item
+            for item in payload["background_media"]
+        ]
+    else:
+        payload["background_media"] = None
+    character = Character(**payload)
     db.add(character)
     await db.commit()
     await db.refresh(character)
@@ -53,7 +61,17 @@ async def update_character(
     character = await db.get(Character, character_id)
     if not character:
         raise HTTPException(status_code=404, detail="Character not found")
-    for key, value in data.model_dump(exclude_unset=True).items():
+    updates = data.model_dump(exclude_unset=True)
+    if "background_media" in updates:
+        media = updates["background_media"]
+        if media:
+            updates["background_media"] = [
+                item if isinstance(item, dict) else item
+                for item in media
+            ]
+        else:
+            updates["background_media"] = None
+    for key, value in updates.items():
         setattr(character, key, value)
     await db.commit()
     await db.refresh(character)
