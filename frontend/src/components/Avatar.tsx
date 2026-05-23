@@ -25,7 +25,8 @@ export default function Avatar({ name, color, avatarUrl, size = 'md' }: AvatarPr
       <img
         src={avatarUrl}
         alt={name}
-        className={`${sizeMap[size]} rounded-full object-cover ring-2 ring-white/10 shrink-0`}
+        className={`${sizeMap[size]} rounded-full object-cover ring-2 ring-primary/20 shrink-0`}
+        style={{ boxShadow: '0 0 12px rgba(168,127,255,0.15)' }}
       />
     );
   }
@@ -33,7 +34,7 @@ export default function Avatar({ name, color, avatarUrl, size = 'md' }: AvatarPr
   return (
     <div
       className={`${sizeMap[size]} rounded-full flex items-center justify-center font-bold text-white ring-2 ring-white/10 shrink-0`}
-      style={{ backgroundColor: color }}
+      style={{ backgroundColor: color, boxShadow: '0 0 12px rgba(168,127,255,0.1)' }}
     >
       {initials}
     </div>

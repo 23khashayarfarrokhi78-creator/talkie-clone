@@ -89,81 +89,100 @@ export default function CreatePage() {
     }
   };
 
+  const inputClass =
+    'w-full bg-surface/80 rounded-xl px-4 py-3 text-sm text-text border border-white/[0.06] focus:border-primary/40 focus:outline-none placeholder:text-text-muted transition-colors';
+  const textareaClass = `${inputClass} resize-none`;
+  const labelClass = 'text-xs font-semibold text-text-muted block mb-2 tracking-wide uppercase';
+
   return (
-    <div className="min-h-screen pb-20">
-      <header className="sticky top-0 bg-bg/80 backdrop-blur-xl z-40 border-b border-white/5">
-        <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
-          <button onClick={() => navigate('/')} className="p-1 hover:bg-surface-light rounded-lg transition-colors">
-            <ArrowLeft size={22} className="text-text" />
-          </button>
-          <h1 className="font-semibold text-text">Create Character</h1>
+    <div className="min-h-dvh pb-28 w-full max-w-full overflow-x-hidden">
+      {/* Header */}
+      <header className="sticky top-0 z-40 safe-area-top">
+        <div className="glass border-b border-white/[0.05]">
+          <div className="flex items-center gap-3 px-6 py-3 max-w-lg mx-auto">
+            <button
+              onClick={() => navigate('/')}
+              className="p-2 rounded-xl hover:bg-white/[0.08] transition-colors shrink-0"
+            >
+              <ArrowLeft size={20} className="text-text" />
+            </button>
+            <h1 className="font-bold text-base text-text">Create Character</h1>
+          </div>
         </div>
       </header>
 
-      <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-4 pt-6 flex flex-col gap-6">
-        {/* Avatar Upload */}
+      <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-6 pt-6 flex flex-col gap-6 w-full">
+        {/* Avatar section */}
         <div className="flex flex-col items-center gap-3">
-          <div className="relative">
-            {avatarPreview ? (
-              <div className="relative">
-                <img
-                  src={avatarPreview}
-                  alt="Avatar"
-                  className="w-24 h-24 rounded-full object-cover ring-2 ring-white/10"
-                />
-                <button
-                  type="button"
-                  onClick={() => { setAvatarPreview(null); setAvatarFile(null); }}
-                  className="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center"
-                >
-                  <X size={14} className="text-white" />
-                </button>
-              </div>
-            ) : (
-              <Avatar name={name || '?'} color={color} size="xl" />
-            )}
-            <button
-              type="button"
-              onClick={() => avatarInputRef.current?.click()}
-              className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary rounded-full flex items-center justify-center ring-2 ring-bg hover:bg-primary-dark transition-colors"
-            >
-              <Camera size={14} className="text-white" />
-            </button>
-            <input
-              ref={avatarInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarSelect}
-              className="hidden"
-            />
+          <div
+            className="relative rounded-2xl p-6 w-full flex flex-col items-center"
+            style={{
+              background: `linear-gradient(135deg, ${color}22 0%, rgba(10,10,18,0.5) 100%)`,
+            }}
+          >
+            <div className="relative">
+              {avatarPreview ? (
+                <div className="relative">
+                  <img
+                    src={avatarPreview}
+                    alt="Avatar"
+                    className="w-24 h-24 rounded-full object-cover ring-2 ring-primary/30"
+                    style={{ boxShadow: '0 0 20px rgba(168,127,255,0.2)' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { setAvatarPreview(null); setAvatarFile(null); }}
+                    className="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center shadow-lg"
+                  >
+                    <X size={14} className="text-white" />
+                  </button>
+                </div>
+              ) : (
+                <Avatar name={name || '?'} color={color} size="xl" />
+              )}
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary rounded-full flex items-center justify-center ring-2 ring-bg hover:bg-primary-dark transition-colors shadow-lg"
+              >
+                <Camera size={14} className="text-white" />
+              </button>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarSelect}
+                className="hidden"
+              />
+            </div>
+            <p className="text-sm text-text-muted mt-3">
+              {name || 'Your character'}
+            </p>
           </div>
-          <p className="text-sm text-text-muted">
-            {name || 'Your character'}
-          </p>
         </div>
 
         {/* Background Image Upload */}
         <div>
-          <label className="text-xs font-medium text-text-muted block mb-2">Chat Background</label>
+          <label className={labelClass}>Chat Background</label>
           {bgPreview ? (
             <div className="relative rounded-xl overflow-hidden">
               <img
                 src={bgPreview}
                 alt="Background"
-                className="w-full h-32 object-cover rounded-xl"
+                className="w-full h-36 object-cover rounded-xl"
               />
-              <div className="absolute inset-0 bg-black/30 flex items-center justify-center gap-2">
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center gap-3">
                 <button
                   type="button"
                   onClick={() => bgInputRef.current?.click()}
-                  className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg text-xs text-white font-medium hover:bg-white/30 transition-colors"
+                  className="px-4 py-2 bg-white/15 backdrop-blur-sm rounded-xl text-xs text-white font-semibold hover:bg-white/25 transition-colors border border-white/10"
                 >
                   Change
                 </button>
                 <button
                   type="button"
                   onClick={() => { setBgPreview(null); setBgFile(null); }}
-                  className="px-3 py-1.5 bg-accent/80 backdrop-blur-sm rounded-lg text-xs text-white font-medium hover:bg-accent transition-colors"
+                  className="px-4 py-2 bg-accent/70 backdrop-blur-sm rounded-xl text-xs text-white font-semibold hover:bg-accent transition-colors"
                 >
                   Remove
                 </button>
@@ -173,7 +192,7 @@ export default function CreatePage() {
             <button
               type="button"
               onClick={() => bgInputRef.current?.click()}
-              className="w-full h-32 bg-surface border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-primary/50 transition-colors"
+              className="w-full h-36 bg-surface/60 border-2 border-dashed border-white/[0.08] rounded-xl flex flex-col items-center justify-center gap-2 hover:border-primary/30 transition-colors"
             >
               <ImagePlus size={24} className="text-text-muted" />
               <span className="text-xs text-text-muted">Add chat background image</span>
@@ -190,16 +209,20 @@ export default function CreatePage() {
 
         {/* Color */}
         <div>
-          <label className="text-xs font-medium text-text-muted block mb-2">
-            Avatar Color {avatarPreview && <span className="text-text-muted/50">(used when no image)</span>}
+          <label className={labelClass}>
+            Avatar Color {avatarPreview && <span className="text-text-dim normal-case">(used when no image)</span>}
           </label>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2.5 flex-wrap">
             {COLORS.map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => setColor(c)}
-                className={`w-8 h-8 rounded-full transition-transform ${color === c ? 'ring-2 ring-white ring-offset-2 ring-offset-bg scale-110' : 'hover:scale-105'}`}
+                className={`w-9 h-9 rounded-full transition-all duration-200 ${
+                  color === c
+                    ? 'ring-2 ring-white ring-offset-2 ring-offset-bg scale-110'
+                    : 'hover:scale-105 ring-1 ring-white/10'
+                }`}
                 style={{ backgroundColor: c }}
               />
             ))}
@@ -207,43 +230,48 @@ export default function CreatePage() {
         </div>
 
         {/* Fields */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           <div>
-            <label className="text-xs font-medium text-text-muted block mb-1.5">Name *</label>
+            <label className={labelClass}>Name *</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Luna, Kai, Dr. Sage..."
-              className="w-full bg-surface rounded-xl px-4 py-2.5 text-sm text-text border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted"
+              className={inputClass}
               required
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-text-muted block mb-1.5">Tagline</label>
+            <label className={labelClass}>Tagline</label>
             <input
               type="text"
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
               placeholder="A short description..."
-              className="w-full bg-surface rounded-xl px-4 py-2.5 text-sm text-text border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-text-muted block mb-1.5">Category</label>
+            <label className={labelClass}>Category</label>
             <div className="flex gap-2 flex-wrap">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat.key}
                   type="button"
                   onClick={() => setCategory(cat.key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 ${
                     category === cat.key
                       ? 'bg-primary text-white'
-                      : 'bg-surface text-text-muted hover:text-text'
+                      : 'bg-surface/60 text-text-muted hover:text-text border border-white/[0.06]'
                   }`}
+                  style={
+                    category === cat.key
+                      ? { boxShadow: '0 2px 12px rgba(168,127,255,0.25)' }
+                      : undefined
+                  }
                 >
                   {cat.label}
                 </button>
@@ -252,54 +280,56 @@ export default function CreatePage() {
           </div>
 
           <div>
-            <label className="text-xs font-medium text-text-muted block mb-1.5">Description</label>
+            <label className={labelClass}>Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Who is this character? Background, interests, quirks..."
               rows={3}
-              className="w-full bg-surface rounded-xl px-4 py-2.5 text-sm text-text border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted resize-none"
+              className={textareaClass}
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-text-muted block mb-1.5">Personality</label>
+            <label className={labelClass}>Personality</label>
             <textarea
               value={personality}
               onChange={(e) => setPersonality(e.target.value)}
               placeholder="Traits, speaking style, mannerisms..."
               rows={3}
-              className="w-full bg-surface rounded-xl px-4 py-2.5 text-sm text-text border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted resize-none"
+              className={textareaClass}
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-text-muted block mb-1.5">Scenario</label>
+            <label className={labelClass}>Scenario</label>
             <textarea
               value={scenario}
               onChange={(e) => setScenario(e.target.value)}
               placeholder="The setting for your conversations..."
               rows={2}
-              className="w-full bg-surface rounded-xl px-4 py-2.5 text-sm text-text border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted resize-none"
+              className={textareaClass}
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-text-muted block mb-1.5">Greeting Message</label>
+            <label className={labelClass}>Greeting Message</label>
             <textarea
               value={greeting}
               onChange={(e) => setGreeting(e.target.value)}
               placeholder="The first message your character sends..."
               rows={3}
-              className="w-full bg-surface rounded-xl px-4 py-2.5 text-sm text-text border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted resize-none"
+              className={textareaClass}
             />
           </div>
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
           disabled={!name.trim() || saving}
-          className="w-full bg-primary text-white rounded-xl py-3 font-semibold flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-primary-dark transition-colors mt-2 mb-6"
+          className="w-full bg-primary text-white rounded-2xl py-3.5 font-bold flex items-center justify-center gap-2 disabled:opacity-40 hover:bg-primary-dark transition-all duration-200 mt-2 mb-6"
+          style={{ boxShadow: '0 4px 20px rgba(168,127,255,0.3)' }}
         >
           <Sparkles size={18} />
           {uploading ? 'Uploading images...' : saving ? 'Creating...' : 'Create Character'}

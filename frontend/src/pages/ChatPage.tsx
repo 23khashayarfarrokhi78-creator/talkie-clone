@@ -140,113 +140,158 @@ export default function ChatPage() {
 
   if (!character) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-dvh flex items-center justify-center bg-bg">
+        <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  const bgStyle = character.background_url
-    ? {
-        backgroundImage: `url(${character.background_url})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed' as const,
-      }
-    : undefined;
+  const hasBg = !!character.background_url;
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg relative" style={bgStyle}>
-      {character.background_url && (
-        <div className="absolute inset-0 bg-bg/70 backdrop-blur-[2px]" />
+    <div className="h-dvh flex flex-col w-full max-w-full overflow-hidden bg-bg relative">
+      {/* Immersive background */}
+      {hasBg && (
+        <>
+          <div
+            className="absolute inset-0 z-0"
+            style={{
+              backgroundImage: `url(${character.background_url})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
+          <div className="absolute inset-0 z-0 gradient-overlay-full" />
+        </>
       )}
-      {/* Header */}
-      <header className="sticky top-0 bg-surface/90 backdrop-blur-xl z-40 border-b border-white/5 relative">
-        <div className="flex items-center gap-3 px-3 py-3 max-w-lg mx-auto">
-          <button onClick={() => navigate('/')} className="p-1 hover:bg-surface-light rounded-lg transition-colors">
-            <ArrowLeft size={22} className="text-text" />
-          </button>
-          <Avatar name={character.name} color={character.avatar_color} avatarUrl={character.avatar_url} size="sm" />
-          <div className="flex-1 min-w-0">
-            <h2 className="font-semibold text-sm text-text truncate">{character.name}</h2>
-            <p className="text-[10px] text-text-muted truncate">{character.tagline}</p>
-          </div>
-          <div className="flex items-center gap-1">
+
+      {/* Floating Header */}
+      <header className="relative z-30 safe-area-top">
+        <div className="glass border-b border-white/[0.05]">
+          <div className="flex items-center gap-3 px-6 py-3 max-w-lg mx-auto">
             <button
-              onClick={() => setTtsEnabled(!ttsEnabled)}
-              className={`p-2 rounded-lg transition-colors ${ttsEnabled ? 'text-primary bg-primary/10' : 'text-text-muted hover:text-text'}`}
-              title={ttsEnabled ? 'Disable voice' : 'Enable voice'}
+              onClick={() => navigate('/')}
+              className="p-2 rounded-xl hover:bg-white/[0.08] transition-colors shrink-0"
             >
-              {ttsEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+              <ArrowLeft size={20} className="text-text" />
             </button>
-            {conversationId && (
+
+            <Avatar
+              name={character.name}
+              color={character.avatar_color}
+              avatarUrl={character.avatar_url}
+              size="sm"
+            />
+
+            <div className="flex-1 min-w-0">
+              <h2 className="font-bold text-sm text-text truncate">{character.name}</h2>
+              <p className="text-[11px] text-text-muted truncate">{character.tagline}</p>
+            </div>
+
+            <div className="flex items-center gap-0.5 shrink-0">
               <button
-                onClick={clearChat}
-                className="p-2 rounded-lg text-text-muted hover:text-accent transition-colors"
-                title="Clear chat"
+                onClick={() => setTtsEnabled(!ttsEnabled)}
+                className={`p-2 rounded-xl transition-colors ${
+                  ttsEnabled
+                    ? 'text-primary bg-primary/15'
+                    : 'text-text-muted hover:text-text hover:bg-white/[0.06]'
+                }`}
+                title={ttsEnabled ? 'Disable voice' : 'Enable voice'}
               >
-                <Trash2 size={18} />
+                {ttsEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
               </button>
-            )}
+              {conversationId && (
+                <button
+                  onClick={clearChat}
+                  className="p-2 rounded-xl text-text-muted hover:text-accent hover:bg-white/[0.06] transition-colors"
+                  title="Clear chat"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Messages */}
-      <main className="flex-1 overflow-y-auto px-4 py-4 max-w-lg mx-auto w-full relative z-10">
-        <div className="flex flex-col gap-3">
-          {messages.length === 0 && !isTyping && (
-            <div className="text-center py-12">
-              <Avatar name={character.name} color={character.avatar_color} avatarUrl={character.avatar_url} size="xl" />
-              <h3 className="font-bold text-lg text-text mt-4">{character.name}</h3>
-              <p className="text-sm text-text-muted mt-1 max-w-[250px] mx-auto">{character.tagline}</p>
-              <p className="text-xs text-text-muted mt-4 bg-surface rounded-xl px-4 py-3 max-w-[300px] mx-auto">
-                {character.scenario || `Say hello to ${character.name}!`}
-              </p>
-            </div>
-          )}
-          {messages.map((msg) => (
-            <ChatBubble
-              key={msg.id}
-              message={msg}
-              characterName={msg.role === 'assistant' ? character.name : undefined}
-              characterColor={character.avatar_color}
-            />
-          ))}
-          {isTyping && <TypingIndicator />}
-          <div ref={messagesEndRef} />
+      {/* Messages area */}
+      <main className="flex-1 overflow-y-auto relative z-10 min-h-0">
+        <div className="px-6 py-4 max-w-lg mx-auto w-full">
+          <div className="flex flex-col gap-3">
+            {/* Empty state */}
+            {messages.length === 0 && !isTyping && (
+              <div className="text-center py-16 animate-fade-in">
+                <div className="flex justify-center">
+                  <Avatar
+                    name={character.name}
+                    color={character.avatar_color}
+                    avatarUrl={character.avatar_url}
+                    size="xl"
+                  />
+                </div>
+                <h3 className="font-bold text-lg text-text mt-5">{character.name}</h3>
+                <p className="text-sm text-text-muted mt-1 max-w-[240px] mx-auto leading-relaxed">
+                  {character.tagline}
+                </p>
+                <div
+                  className="mt-5 bg-bubble-ai border border-white/[0.06] rounded-2xl px-5 py-4 max-w-[280px] mx-auto"
+                  style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
+                >
+                  <p className="text-[13px] text-text/80 leading-relaxed">
+                    {character.scenario || `Say hello to ${character.name}!`}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {messages.map((msg) => (
+              <ChatBubble
+                key={msg.id}
+                message={msg}
+                characterName={msg.role === 'assistant' ? character.name : undefined}
+                characterColor={character.avatar_color}
+              />
+            ))}
+            {isTyping && <TypingIndicator />}
+            <div ref={messagesEndRef} className="h-2" />
+          </div>
         </div>
       </main>
 
-      {/* Input */}
-      <footer className="sticky bottom-0 bg-surface/90 backdrop-blur-xl border-t border-white/5 safe-area-bottom relative z-10">
-        <div className="flex items-end gap-2 px-3 py-3 max-w-lg mx-auto">
-          <button
-            onClick={toggleListening}
-            className={`p-2.5 rounded-xl transition-colors shrink-0 ${
-              isListening
-                ? 'bg-accent text-white animate-pulse'
-                : 'text-text-muted hover:text-text hover:bg-surface-light'
-            }`}
-          >
-            {isListening ? <MicOff size={20} /> : <Mic size={20} />}
-          </button>
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={handleTextareaInput}
-            onKeyDown={handleKeyDown}
-            placeholder={`Message ${character.name}...`}
-            rows={1}
-            className="flex-1 bg-surface-light text-text text-sm rounded-xl px-4 py-2.5 resize-none border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted max-h-[120px]"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!input.trim() || isTyping}
-            className="p-2.5 rounded-xl bg-primary text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-primary-dark transition-colors shrink-0"
-          >
-            <Send size={20} />
-          </button>
+      {/* Floating input bar */}
+      <footer className="relative z-30 safe-area-bottom">
+        <div className="glass border-t border-white/[0.05]">
+          <div className="flex items-end gap-2 px-5 py-3 max-w-lg mx-auto">
+            <button
+              onClick={toggleListening}
+              className={`p-2.5 rounded-xl transition-all duration-200 shrink-0 ${
+                isListening
+                  ? 'bg-accent text-white animate-pulse shadow-lg'
+                  : 'text-text-muted hover:text-text hover:bg-white/[0.06]'
+              }`}
+            >
+              {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+            </button>
+
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={handleTextareaInput}
+              onKeyDown={handleKeyDown}
+              placeholder={`Message ${character.name}...`}
+              rows={1}
+              className="flex-1 min-w-0 bg-surface-light/80 text-text text-sm rounded-2xl px-4 py-2.5 resize-none border border-white/[0.06] focus:border-primary/40 focus:outline-none placeholder:text-text-muted max-h-[120px]"
+            />
+
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || isTyping}
+              className="p-2.5 rounded-xl bg-primary text-white disabled:opacity-25 disabled:cursor-not-allowed hover:bg-primary-dark transition-all duration-200 shrink-0"
+              style={{ boxShadow: input.trim() && !isTyping ? '0 2px 12px rgba(168,127,255,0.35)' : 'none' }}
+            >
+              <Send size={20} />
+            </button>
+          </div>
         </div>
       </footer>
     </div>

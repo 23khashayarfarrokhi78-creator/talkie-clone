@@ -8,7 +8,7 @@ import SettingsPage from './pages/SettingsPage';
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-bg">
+      <div className="min-h-dvh w-full max-w-full overflow-x-hidden bg-bg">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/chat/:characterId" element={<ChatPage />} />
