@@ -41,7 +41,7 @@ export default function HomePage() {
       {/* Header */}
       <header className="sticky top-0 z-40 safe-area-top">
         <div className="glass border-b border-white/[0.05]">
-          <div className="max-w-lg mx-auto px-4 pt-4 pb-3">
+          <div className="max-w-lg mx-auto px-6 pt-4 pb-3">
             <div className="flex items-center gap-2">
               <Sparkles size={20} className="text-primary" />
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -64,7 +64,7 @@ export default function HomePage() {
           </div>
 
           {/* Category pills */}
-          <div className="max-w-lg mx-auto px-4 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
+          <div className="max-w-lg mx-auto px-6 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.key}
@@ -88,7 +88,7 @@ export default function HomePage() {
       </header>
 
       {/* Content */}
-      <main className="max-w-lg mx-auto px-4 pt-4 w-full">
+      <main className="max-w-lg mx-auto px-6 pt-4 w-full">
         {loading ? (
           <div className="grid grid-cols-2 gap-3">
             {[...Array(6)].map((_, i) => (

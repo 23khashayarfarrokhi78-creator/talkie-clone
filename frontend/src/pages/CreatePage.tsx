@@ -99,7 +99,7 @@ export default function CreatePage() {
       {/* Header */}
       <header className="sticky top-0 z-40 safe-area-top">
         <div className="glass border-b border-white/[0.05]">
-          <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
+          <div className="flex items-center gap-3 px-6 py-3 max-w-lg mx-auto">
             <button
               onClick={() => navigate('/')}
               className="p-2 rounded-xl hover:bg-white/[0.08] transition-colors shrink-0"
@@ -111,7 +111,7 @@ export default function CreatePage() {
         </div>
       </header>
 
-      <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-4 pt-6 flex flex-col gap-6 w-full">
+      <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-6 pt-6 flex flex-col gap-6 w-full">
         {/* Avatar section */}
         <div className="flex flex-col items-center gap-3">
           <div

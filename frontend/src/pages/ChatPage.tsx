@@ -168,7 +168,7 @@ export default function ChatPage() {
       {/* Floating Header */}
       <header className="relative z-30 safe-area-top">
         <div className="glass border-b border-white/[0.05]">
-          <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
+          <div className="flex items-center gap-3 px-6 py-3 max-w-lg mx-auto">
             <button
               onClick={() => navigate('/')}
               className="p-2 rounded-xl hover:bg-white/[0.08] transition-colors shrink-0"
@@ -216,7 +216,7 @@ export default function ChatPage() {
 
       {/* Messages area */}
       <main className="flex-1 overflow-y-auto relative z-10 min-h-0">
-        <div className="px-4 py-4 max-w-lg mx-auto w-full">
+        <div className="px-6 py-4 max-w-lg mx-auto w-full">
           <div className="flex flex-col gap-3">
             {/* Empty state */}
             {messages.length === 0 && !isTyping && (
@@ -261,7 +261,7 @@ export default function ChatPage() {
       {/* Floating input bar */}
       <footer className="relative z-30 safe-area-bottom">
         <div className="glass border-t border-white/[0.05]">
-          <div className="flex items-end gap-2 px-3 py-3 max-w-lg mx-auto">
+          <div className="flex items-end gap-2 px-5 py-3 max-w-lg mx-auto">
             <button
               onClick={toggleListening}
               className={`p-2.5 rounded-xl transition-all duration-200 shrink-0 ${

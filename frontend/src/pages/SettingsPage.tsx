@@ -18,7 +18,7 @@ export default function SettingsPage() {
       {/* Header */}
       <header className="sticky top-0 z-40 safe-area-top">
         <div className="glass border-b border-white/[0.05]">
-          <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
+          <div className="flex items-center gap-3 px-6 py-3 max-w-lg mx-auto">
             <button
               onClick={() => navigate('/')}
               className="p-2 rounded-xl hover:bg-white/[0.08] transition-colors shrink-0"
@@ -30,7 +30,7 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 pt-6 flex flex-col gap-4 w-full">
+      <div className="max-w-lg mx-auto px-6 pt-6 flex flex-col gap-4 w-full">
         {/* API Key */}
         <div
           className="bg-surface/70 rounded-2xl p-5 border border-white/[0.06]"
