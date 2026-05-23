@@ -9,11 +9,11 @@ import {
 } from '../services/openrouter';
 
 const SUGGESTED_MODELS = [
-  'google/gemini-2.0-flash-exp:free',
-  'google/gemini-flash-1.5',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'deepseek/deepseek-chat-v3-0324:free',
+  'google/gemini-flash-1.5-8b',
   'openai/gpt-4o-mini',
   'anthropic/claude-3.5-haiku',
-  'meta-llama/llama-3.1-70b-instruct',
 ];
 
 export default function SettingsPage() {
@@ -79,7 +79,7 @@ export default function SettingsPage() {
             list="openrouter-models"
             value={model}
             onChange={(e) => setModel(e.target.value)}
-            placeholder="google/gemini-2.0-flash-exp:free"
+            placeholder="meta-llama/llama-3.3-70b-instruct:free"
             autoComplete="off"
             spellCheck={false}
             className="w-full bg-surface-light rounded-xl px-4 py-3 text-sm text-text border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted mb-3"

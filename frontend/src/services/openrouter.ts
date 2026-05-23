@@ -4,7 +4,7 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 const LS_KEY = 'openrouter_api_key';
 const LS_MODEL = 'openrouter_model';
-const DEFAULT_MODEL = 'google/gemini-2.0-flash-exp:free';
+const DEFAULT_MODEL = 'meta-llama/llama-3.3-70b-instruct:free';
 
 export function getApiKey(): string {
   return localStorage.getItem(LS_KEY) ?? '';
@@ -70,10 +70,24 @@ export interface GenerateInput {
   userMessage: string;
 }
 
+function errorMessage(status: number, body: string, model: string): string {
+  const snippet = body.slice(0, 400);
+  return (
+    `*[OpenRouter error ${status}]*\n` +
+    `Model: \`${model}\`\n` +
+    `Response: ${snippet || '(empty)'}\n\n` +
+    `Open Settings to fix your key or pick a different model.`
+  );
+}
+
 export async function generateReply(input: GenerateInput): Promise<string> {
   const apiKey = getApiKey();
   if (!apiKey) {
-    return fallbackResponse(input.characterName, input.userMessage);
+    return (
+      `*[No OpenRouter key]*\n` +
+      `Open Settings and paste your key, then tap Save. ` +
+      `Without a key the chat falls back to scripted replies.`
+    );
   }
 
   const system = buildSystemPrompt(
@@ -84,8 +98,9 @@ export async function generateReply(input: GenerateInput): Promise<string> {
   );
 
   const trimmedHistory = input.history.slice(-20);
+  const model = getModel();
   const body = {
-    model: getModel(),
+    model,
     messages: [
       { role: 'system', content: system },
       ...trimmedHistory.map((m) => ({ role: m.role, content: m.content })),
@@ -109,16 +124,35 @@ export async function generateReply(input: GenerateInput): Promise<string> {
     if (!res.ok) {
       const errText = await res.text().catch(() => '');
       console.error('OpenRouter error', res.status, errText);
-      return fallbackResponse(input.characterName, input.userMessage);
+      return errorMessage(res.status, errText, model);
     }
     const data = (await res.json()) as {
       choices?: { message?: { content?: string } }[];
+      error?: { message?: string; code?: number };
     };
+    if (data.error?.message) {
+      return errorMessage(data.error.code ?? 0, data.error.message, model);
+    }
     const text = data.choices?.[0]?.message?.content?.trim();
-    if (!text) return fallbackResponse(input.characterName, input.userMessage);
+    if (!text) {
+      return errorMessage(
+        0,
+        'No content in response: ' + JSON.stringify(data).slice(0, 300),
+        model,
+      );
+    }
     return text;
   } catch (err) {
     console.error('OpenRouter request failed', err);
-    return fallbackResponse(input.characterName, input.userMessage);
+    const msg = err instanceof Error ? err.message : String(err);
+    return (
+      `*[Network error reaching OpenRouter]*\n` +
+      `Model: \`${model}\`\n` +
+      `Detail: ${msg}\n\n` +
+      `Check your phone's internet connection.`
+    );
   }
 }
+
+// Kept for internal use if we ever want the canned offline experience back.
+export { fallbackResponse };
