@@ -38,11 +38,13 @@
   --shadow-glow: 0 0 20px rgba(168, 127, 255, 0.15);
 }
 
-/* ── Global reset ── */
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ── Global reset (in @layer base so Tailwind utilities can override) ── */
+@layer base {
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 }
 
 html {
