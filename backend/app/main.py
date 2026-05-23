@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from app.config import settings
 from app.database import async_session, engine
@@ -12,10 +12,28 @@ from app.routers import characters, chat, uploads
 from app.seed import DEFAULT_CHARACTERS
 
 
+async def _ensure_schema_migrations(conn) -> None:  # type: ignore[no-untyped-def]
+    """Idempotent in-place migrations for SQLite (no Alembic).
+
+    Adds new columns introduced after the initial release so existing DBs
+    keep working without manual intervention.
+    """
+    result = await conn.execute(text("PRAGMA table_info(characters)"))
+    columns = {row[1] for row in result.fetchall()}
+    if "background_media" not in columns:
+        await conn.execute(
+            text(
+                "ALTER TABLE characters "
+                "ADD COLUMN background_media JSON DEFAULT '[]'"
+            )
+        )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await _ensure_schema_migrations(conn)
 
     async with async_session() as session:
         result = await session.execute(select(Character).where(Character.is_default.is_(True)))

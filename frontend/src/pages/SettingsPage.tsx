@@ -14,19 +14,19 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-24">
       <header className="sticky top-0 bg-bg/80 backdrop-blur-xl z-40 border-b border-white/5">
-        <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
-          <button onClick={() => navigate('/')} className="p-1 hover:bg-surface-light rounded-lg transition-colors">
+        <div className="flex items-center gap-3 px-4 sm:px-6 py-3 max-w-lg mx-auto">
+          <button onClick={() => navigate('/')} className="p-1.5 hover:bg-surface-light rounded-lg transition-colors">
             <ArrowLeft size={22} className="text-text" />
           </button>
           <h1 className="font-semibold text-text">Settings</h1>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 pt-6 flex flex-col gap-6">
+      <div className="max-w-lg mx-auto px-4 sm:px-6 pt-6 flex flex-col gap-6">
         {/* API Key */}
-        <div className="bg-surface rounded-2xl p-4 border border-white/5">
+        <div className="bg-surface rounded-2xl p-5 border border-white/5">
           <div className="flex items-center gap-2 mb-3">
             <Key size={18} className="text-primary" />
             <h2 className="font-semibold text-sm text-text">Gemini API Key</h2>
@@ -48,11 +48,11 @@ export default function SettingsPage() {
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             placeholder="Enter your Gemini API key..."
-            className="w-full bg-surface-light rounded-xl px-4 py-2.5 text-sm text-text border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted mb-3"
+            className="w-full bg-surface-light rounded-xl px-4 py-3 text-sm text-text border border-white/5 focus:border-primary/50 focus:outline-none placeholder:text-text-muted mb-3"
           />
           <button
             onClick={handleSave}
-            className={`w-full rounded-xl py-2.5 text-sm font-medium transition-colors ${
+            className={`w-full rounded-xl py-3 text-sm font-medium transition-colors ${
               saved
                 ? 'bg-green-500/20 text-green-400'
                 : 'bg-primary text-white hover:bg-primary-dark'
@@ -63,7 +63,7 @@ export default function SettingsPage() {
         </div>
 
         {/* About */}
-        <div className="bg-surface rounded-2xl p-4 border border-white/5">
+        <div className="bg-surface rounded-2xl p-5 border border-white/5">
           <div className="flex items-center gap-2 mb-3">
             <Info size={18} className="text-primary" />
             <h2 className="font-semibold text-sm text-text">About</h2>
@@ -76,7 +76,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Voice Info */}
-        <div className="bg-surface rounded-2xl p-4 border border-white/5">
+        <div className="bg-surface rounded-2xl p-5 border border-white/5">
           <h2 className="font-semibold text-sm text-text mb-2">Voice Chat</h2>
           <div className="text-xs text-text-muted space-y-2">
             <p>
