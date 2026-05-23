@@ -1,108 +1,101 @@
-const API_BASE = import.meta.env.PROD
-  ? 'https://talkie-backend-szujqamg.fly.dev/api'
-  : '/api';
-
-async function request<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${url}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || 'Request failed');
-  }
-  if (res.status === 204) return undefined as T;
-  return res.json();
-}
-
 import type {
   BackgroundMediaType,
   Character,
   ChatResponse,
   Conversation,
+  Message,
 } from '../types';
+import { fileToDataUrl, inferMediaType, localStore } from './localStore';
+import { generateReply } from './openrouter';
 
 export interface UploadResult {
   url: string;
   type: BackgroundMediaType;
 }
 
-function absoluteUrl(url: string): string {
-  if (!url) return url;
-  if (/^https?:\/\//i.test(url)) return url;
-  if (import.meta.env.PROD) {
-    return `https://talkie-backend-szujqamg.fly.dev${url}`;
-  }
-  return url;
-}
-
-function inferTypeFromFile(file: File): BackgroundMediaType {
-  if (file.type.startsWith('video/')) return 'video';
-  if (file.type.startsWith('image/')) return 'image';
-  const ext = file.name.toLowerCase().split('.').pop() ?? '';
-  if (['mp4', 'webm', 'mov', 'ogv', 'm4v'].includes(ext)) return 'video';
-  return 'image';
-}
-
+/**
+ * Local-only API surface. Mirrors the original HTTP-backed `api` shape so the
+ * UI doesn't care that everything now lives on-device.
+ */
 export const api = {
-  getCharacters: (category?: string) =>
-    request<Character[]>(`/characters${category ? `?category=${category}` : ''}`),
+  getCharacters: (category?: string): Promise<Character[]> =>
+    localStore.listCharacters(category),
 
-  getCharacter: (id: string) =>
-    request<Character>(`/characters/${id}`),
+  getCharacter: (id: string): Promise<Character> => localStore.getCharacter(id),
 
-  createCharacter: (data: Partial<Character>) =>
-    request<Character>('/characters', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
+  createCharacter: (data: Partial<Character>): Promise<Character> =>
+    localStore.createCharacter(data),
 
-  updateCharacter: (id: string, data: Partial<Character>) =>
-    request<Character>(`/characters/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }),
+  updateCharacter: (id: string, data: Partial<Character>): Promise<Character> =>
+    localStore.updateCharacter(id, data),
 
-  deleteCharacter: (id: string) =>
-    request<void>(`/characters/${id}`, { method: 'DELETE' }),
+  deleteCharacter: (id: string): Promise<void> => localStore.deleteCharacter(id),
 
-  getConversations: (characterId: string) =>
-    request<Conversation[]>(`/characters/${characterId}/conversations`),
+  getConversations: (characterId: string): Promise<Conversation[]> =>
+    localStore.listConversations(characterId),
 
-  getConversation: (id: string) =>
-    request<Conversation>(`/conversations/${id}`),
+  getConversation: (id: string): Promise<Conversation> =>
+    localStore.getConversation(id),
 
-  deleteConversation: (id: string) =>
-    request<void>(`/conversations/${id}`, { method: 'DELETE' }),
+  deleteConversation: (id: string): Promise<void> =>
+    localStore.deleteConversation(id),
 
-  sendMessage: (characterId: string, message: string, conversationId?: string) =>
-    request<ChatResponse>(`/characters/${characterId}/chat`, {
-      method: 'POST',
-      body: JSON.stringify({ message, conversation_id: conversationId }),
-    }),
+  async sendMessage(
+    characterId: string,
+    message: string,
+    conversationId?: string,
+  ): Promise<ChatResponse> {
+    const character = await localStore.getCharacter(characterId);
 
-  // Generic media uploader supporting images AND videos.
-  uploadMedia: async (file: File): Promise<UploadResult> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await fetch(`${API_BASE}/uploads`, {
-      method: 'POST',
-      body: formData,
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: 'Upload failed' }));
-      throw new Error(err.detail || 'Upload failed');
+    let conversation: Conversation;
+    let history: Message[] = [];
+
+    if (conversationId) {
+      conversation = await localStore.getConversation(conversationId);
+      history = conversation.messages ?? [];
+    } else {
+      conversation = await localStore.createConversation(
+        characterId,
+        message,
+      );
+      if (character.greeting) {
+        await localStore.appendMessage(
+          conversation.id,
+          'assistant',
+          character.greeting,
+        );
+        history = await localStore.listMessages(conversation.id);
+      }
     }
-    const data = (await res.json()) as { url: string; type?: BackgroundMediaType };
-    return {
-      url: absoluteUrl(data.url),
-      type: data.type ?? inferTypeFromFile(file),
-    };
+
+    await localStore.appendMessage(conversation.id, 'user', message);
+
+    const reply = await generateReply({
+      characterName: character.name,
+      personality: character.personality,
+      scenario: character.scenario,
+      description: character.description,
+      history: history.map((m) => ({ role: m.role, content: m.content })),
+      userMessage: message,
+    });
+
+    const aiMsg = await localStore.appendMessage(
+      conversation.id,
+      'assistant',
+      reply,
+    );
+
+    return { message: aiMsg, conversation_id: conversation.id };
+  },
+
+  uploadMedia: async (file: File): Promise<UploadResult> => {
+    const url = await fileToDataUrl(file);
+    return { url, type: inferMediaType(file) };
   },
 
   // Legacy image-only helper kept for backward compatibility.
   uploadImage: async (file: File): Promise<string> => {
-    const { url } = await api.uploadMedia(file);
+    const url = await fileToDataUrl(file);
     return url;
   },
 };
