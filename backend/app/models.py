@@ -1,7 +1,8 @@
 import datetime
 import uuid
+from typing import Any
 
-from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy import JSON, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -22,6 +23,9 @@ class Character(Base):
     avatar_url: Mapped[str] = mapped_column(String(500), default="")
     avatar_color: Mapped[str] = mapped_column(String(7), default="#6366f1")
     background_url: Mapped[str] = mapped_column(String(500), default="")
+    background_media: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSON, default=list, server_default="[]"
+    )
     category: Mapped[str] = mapped_column(String(50), default="custom")
     is_default: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime.datetime] = mapped_column(

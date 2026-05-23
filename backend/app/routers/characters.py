@@ -37,7 +37,8 @@ async def create_character(
     data: CharacterCreate,
     db: AsyncSession = Depends(get_db),
 ) -> Character:
-    character = Character(**data.model_dump())
+    # mode="json" serializes nested BackgroundMediaItem -> dicts for JSON column.
+    character = Character(**data.model_dump(mode="json"))
     db.add(character)
     await db.commit()
     await db.refresh(character)
@@ -53,7 +54,7 @@ async def update_character(
     character = await db.get(Character, character_id)
     if not character:
         raise HTTPException(status_code=404, detail="Character not found")
-    for key, value in data.model_dump(exclude_unset=True).items():
+    for key, value in data.model_dump(exclude_unset=True, mode="json").items():
         setattr(character, key, value)
     await db.commit()
     await db.refresh(character)

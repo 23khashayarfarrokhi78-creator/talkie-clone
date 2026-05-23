@@ -1,6 +1,14 @@
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+class BackgroundMediaItem(BaseModel):
+    type: Literal["image", "video"] = "image"
+    url: str
+    id: str | None = None
+    created_at: datetime | None = None
 
 
 class CharacterCreate(BaseModel):
@@ -13,6 +21,7 @@ class CharacterCreate(BaseModel):
     avatar_url: str = ""
     avatar_color: str = "#6366f1"
     background_url: str = ""
+    background_media: list[BackgroundMediaItem] = Field(default_factory=list)
     category: str = "custom"
 
 
@@ -26,6 +35,7 @@ class CharacterUpdate(BaseModel):
     avatar_url: str | None = None
     avatar_color: str | None = None
     background_url: str | None = None
+    background_media: list[BackgroundMediaItem] | None = None
     category: str | None = None
 
 
@@ -40,6 +50,7 @@ class CharacterOut(BaseModel):
     avatar_url: str
     avatar_color: str
     background_url: str
+    background_media: list[BackgroundMediaItem] = Field(default_factory=list)
     category: str
     is_default: bool
     created_at: datetime

@@ -37,9 +37,9 @@ export default function HomePage() {
     : characters;
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-24">
       <header className="sticky top-0 bg-bg/80 backdrop-blur-xl z-40 border-b border-white/5">
-        <div className="max-w-lg mx-auto px-4 pt-4 pb-3">
+        <div className="max-w-lg mx-auto px-4 sm:px-6 pt-5 pb-3">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Talkie
           </h1>
@@ -57,7 +57,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="max-w-lg mx-auto px-4 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
+        <div className="max-w-lg mx-auto px-4 sm:px-6 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.key}
@@ -74,9 +74,9 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 pt-4">
+      <main className="max-w-lg mx-auto px-4 sm:px-6 pt-5">
         {loading ? (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="bg-surface rounded-2xl h-44 animate-pulse" />
             ))}
@@ -87,7 +87,7 @@ export default function HomePage() {
             <p className="text-sm mt-2">Try a different search or category</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {filtered.map((character) => (
               <CharacterCard key={character.id} character={character} />
             ))}
